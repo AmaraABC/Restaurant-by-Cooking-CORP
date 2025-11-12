@@ -1,0 +1,81 @@
+# ===================================================
+# 🚫 Node & dépendances
+# ===================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===================================================
+# 🧩 Environnements & configurations sensibles
+# ===================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Fichiers de configuration locaux
+*.env.backup
+*.secret
+*.local.json
+
+# ===================================================
+# 🪣 Logs et sorties
+# ===================================================
+logs
+*.log
+*.log.*
+debug.log
+pids
+*.pid
+*.seed
+
+# ===================================================
+# 🧠 Caches
+# ===================================================
+.cache/
+dist/
+build/
+coverage/
+.tmp/
+temp/
+.DS_Store
+Thumbs.db
+
+# ===================================================
+# 🧪 Tests
+# ===================================================
+/coverage
+/.nyc_output
+/test-results
+
+# ===================================================
+# 🧰 IDE / OS spécifiques
+# ===================================================
+# VSCode
+.vscode/
+.history/
+# JetBrains (WebStorm, IntelliJ)
+.idea/
+# macOS
+.DS_Store
+# Windows
+Desktop.ini
+
+# ===================================================
+# 🐳 Docker (si utilisé)
+# ===================================================
+/docker-compose.override.yml
+/.docker/
+*.tar
+
+# ===================================================
+# 🧮 Base de données locales
+# ===================================================
+/data/
+*.db
+*.sqlite
+dump.sql
+*.rdb
