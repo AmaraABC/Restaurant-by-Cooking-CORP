@@ -6,7 +6,6 @@ import userRouter from "./src/routes/user.routes.js";
 import reservationRouter from "./src/routes/reservation.routes.js";
 import commandeRouter from "./src/routes/commande.routes.js";
 import tableRouter from "./src/routes/table.routes.js";
-import e from "express";
 
 const app = express();
 app.use(cors());
