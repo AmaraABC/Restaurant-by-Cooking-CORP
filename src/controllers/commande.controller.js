@@ -1,4 +1,4 @@
-import { pool } from "../config/db.postgres²js";
+import { pool } from "../config/db.postgres.js";
 
 // Récupérer toutes les commandes
 export const getAllCommandes = async (req, res) => {
