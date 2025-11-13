@@ -79,3 +79,4 @@ Desktop.ini
 *.sqlite
 dump.sql
 *.rdb
+/src/generated/prisma
