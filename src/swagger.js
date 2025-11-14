@@ -4,7 +4,7 @@ export const swaggerSpec = swaggerJsdoc({
     definition: {
         openapi: "3.0.0",
         info:{
-            title : "TP Express + prisma",
+            title : "TP Express",
             version: "1.0.0",
         }
     },
