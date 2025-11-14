@@ -63,18 +63,15 @@ export const updateReservation = async (req, res) => {
     const userId = req.user.id;      // récupéré depuis le JWT
     const userRole = req.user.role;  // 'client' ou 'staff'
 
-    // Vérifier si la réservation existe
     const reservation = await Reservation.findById(id);
     if (!reservation) {
       return res.status(404).json({ message: "Réservation introuvable." });
     }
 
-    // Vérifier les permissions
     if (userRole !== "staff" && reservation.users_id !== userId) {
       return res.status(403).json({ message: "Action non autorisée." });
     }
 
-    // Vérifier la disponibilité si table/date/heure changent
     const tableIdToCheck = updates.table_id ?? reservation.table_id;
     const dateToCheck = updates.reservation_date ?? reservation.reservation_date;
     const timeToCheck = updates.reservation_time ?? reservation.reservation_time;
@@ -88,7 +85,6 @@ export const updateReservation = async (req, res) => {
       }
     }
 
-    // Mettre à jour la réservation
     const updated = await Reservation.update(id, updates);
 
     res.status(200).json({
@@ -115,7 +111,6 @@ export const deleteReservation = async (req, res) => {
       return res.status(403).json({ message: "Action non autorisée." });
     }
 
-    // Suppression
     const deleted = await Reservation.delete(id);
     if (!deleted) return res.status(404).json({ message: "Suppression échouée." });
 
