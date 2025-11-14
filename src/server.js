@@ -7,11 +7,14 @@ import userRoute from "./routes/user.routes.js";
 import tableReservationRoutes from "./routes/tableReservation.routes.js";
 import reservationRoutes from "./routes/reservation.routes.js";
 import ordersRoutes from "./routes/orders.routes.js";
+import { connectMongo } from './config/db.mongo.js';
 import platRoutes from "./routes/plat.routes.js";
+import recetteRoutes from "./routes/recette.routes.js";
 import { swaggerDocs } from "./swagger.js";
 
 dotenv.config();
 const app = express();
+connectMongo();
 
 app.use(express.json());
 app.use(cors());
@@ -22,7 +25,8 @@ app.use("/users", userRoute);
 app.use("/tables", tableReservationRoutes);
 app.use("/reservations", reservationRoutes);
 app.use("/orders", ordersRoutes);
-app.use("/dishes", platRoutes);
+app.use("/meals", platRoutes);
+app.use("/recipes", recetteRoutes);
 swaggerDocs(app);
 
 app.listen(process.env.PORT || 3000, () =>
