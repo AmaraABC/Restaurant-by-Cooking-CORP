@@ -33,3 +33,5 @@ app.listen(process.env.PORT || 3000, () =>
 app.get("/", (req, res) => {
   res.send("Welcome to Restaurant by Cooking CORP !");
 });
+
+export default app;

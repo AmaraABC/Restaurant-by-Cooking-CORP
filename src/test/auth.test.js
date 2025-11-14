@@ -1,8 +1,7 @@
 import { request } from "supertest";
-import app from "../../app.js";
+import app from "../server.js";
 import authRoutes from "../routes/auth.routes.js";
 import { pool } from "../config/db.postgres.js";
-
 
 jest.setTimeout(20000);
 
@@ -81,4 +80,3 @@ describe("Authentication API", () => {
         await pool.end();
     });
 });
-

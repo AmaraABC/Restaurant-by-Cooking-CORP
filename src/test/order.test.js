@@ -1,5 +1,5 @@
 import { request } from "supertest";
-import app from "../../app.js";
+import app from "../server.js";
 import { Pool } from "../config/db.postgres.js";
 
 jest.setTimeout(20000);
