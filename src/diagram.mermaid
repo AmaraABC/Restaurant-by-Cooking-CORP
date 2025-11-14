@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant Client
+    participant Express as "Express API"
+    participant Middleware as "Middlewares\n(auth, role, validation)"
+    participant Controller as "Controller"
+    participant SQLDB as "PostgreSQL (SQL)"
+    participant NoSQLDB as "MongoDB (NoSQL)"
+
+    Client->>Express: Requête HTTP (GET/POST/PUT/DELETE)
+    Express->>Middleware: Passage dans middlewares
+    Middleware-->>Express: Validation OK / Erreur
+    alt Validation échoue
+        Middleware-->>Client: 401/403/400 + message
+    else Validation OK
+        Express->>Controller: Appel de la fonction correspondante
+        alt Ressource SQL
+            Controller->>SQLDB: Requête SQL (SELECT, INSERT, UPDATE, DELETE)
+            SQLDB-->>Controller: Résultat ou erreur
+        else Ressource NoSQL
+            Controller->>NoSQLDB: Requête MongoDB (find, create, update, delete)
+            NoSQLDB-->>Controller: Résultat ou erreur
+        end
+        alt Erreur DB
+            Controller-->>Client: 500 + message d'erreur
+        else Succès DB
+            Controller-->>Client: 200/201 + données JSON
+        end
+    end
