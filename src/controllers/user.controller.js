@@ -1,69 +1,141 @@
-import { User } from "../models/user.model.js";
-import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import Users from "../models/Users.js";
 import jwt from "jsonwebtoken";
-
+import dotenv from "dotenv";
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const register = async (req, res) => {
     try {
-        const { email, password, role } = req.body;
+        const { username, email, password, role } = req.body;
 
-        if (await User.findOne({ email })) {
-            return res.status(400).json({ message: "Email déjà utilisé" });
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: "Tous les champs sont requis." });
         }
 
-        const user = new User({ email, password, role });
-        await user.save();
+        const existing = await Users.findByEmail(email);
+        if (existing) {
+            return res.status(400).json({ message: "Email déjà utilisé." });
+        }
 
-        res.status(201).json({ message: "Utilisateur créé", user: { id: user._id, email, role } });
+        const newUser = await Users.create({ username, email, password, role });
+
+        res.status(201).json({
+            message: "Utilisateur créé avec succès.",
+            user: newUser.toJSON()
+        });
+
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ error: err.message });
     }
 };
 
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email }).select("+password");
-        if (!user) return res.status(400).json({ message: "Email ou mot de passe invalide" });
 
-        const ok = await bcrypt.compare(password, user.password);
-        if (!ok) return res.status(400).json({ message: "Email ou mot de passe invalide" });
+        const user = await Users.findByEmail(email);
+        if (!user) {
+            return res.status(400).json({ message: "Email ou mot de passe incorrect." });
+        }
 
-        const token = jwt.sign({ sub: user._id, role: user.role }, JWT_SECRET, { expiresIn: "2h" });
+        const valid = await user.verifyPassword(password);
+        if (!valid) {
+            return res.status(400).json({ message: "Email ou mot de passe incorrect." });
+        }
 
-        res.json({ token, user: { id: user._id, email: user.email, role: user.role } });
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            JWT_SECRET,
+            { expiresIn: "2h" }
+        );
+
+        res.json({
+            message: "Connexion réussie.",
+            token,
+            user: user.toJSON()
+        });
+
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ error: err.message });
     }
 };
 
 export const getAllUsers = async (req, res) => {
-    const users = await User.find().select("-password");
-    res.json(users);
+    try {
+        const users = await Users.findAll();
+
+        res.status(200).json(users.map(u => u.toJSON()));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 export const getUserById = async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res.json(user);
+    try {
+        const user = await Users.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
+
+        res.status(200).json(user.toJSON());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 export const updateUser = async (req, res) => {
-    const { email, password, role } = req.body;
-    const updateData = { email, role };
-    if (password) updateData.password = await bcrypt.hash(password, 10);
+    try {
+        const { id } = req.params;
+        const updates = req.body;
 
-    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select("-password");
-    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res.json({ message: "Utilisateur mis à jour", user });
+        const requesterId = req.user.id;
+        const requesterRole = req.user.role;
+
+        const updated = await Users.update(id, updates, requesterRole, requesterId);
+
+        res.status(200).json({
+            message: "Utilisateur mis à jour avec succès.",
+            user: updated.toJSON()
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 export const deleteUser = async (req, res) => {
-    const user = await User.findByIdAndDelete(req.params.id).select("-password");
-    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res.json({ message: "Utilisateur supprimé", user });
+    try {
+        const { id } = req.params;
+
+        const requesterId = req.user.id;
+        const requesterRole = req.user.role;
+
+        const deleted = await Users.delete(id, requesterRole, requesterId);
+        if (!deleted) return res.status(404).json({ message: "Utilisateur introuvable." });
+
+        res.status(200).json({ message: "Utilisateur supprimé avec succès." });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getMyProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await Users.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé." });
+        }
+
+        res.status(200).json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };

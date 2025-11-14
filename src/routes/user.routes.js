@@ -5,23 +5,22 @@ import {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    getMyProfile
 } from "../controllers/user.controller.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorize } from "../middlewares/role.middleware.js";
 
-import { auth, requireRole } from "../middlewares/auth.middleware.js";
+const router = express.Router();
 
-const userRoute = express.Router();
+router.post("/register", register);
+router.post("/login", login);
 
-userRoute.post("/auth/register", register);
-userRoute.post("/auth/login", login);
+router.get("/me", authenticate, getMyProfile);
+router.put("/:id", authenticate, updateUser);
+router.delete("/:id", authenticate, deleteUser);
 
-userRoute.use(auth);
+router.get("/", authenticate, authorize("staff"), getAllUsers);
+router.get("/:id", authenticate, authorize("staff"), getUserById);
 
-userRoute.get("/", getAllUsers);
-userRoute.get("/:id", getUserById);
-userRoute.put("/:id", updateUser);
-userRoute.delete("/:id", deleteUser);
-
-userRoute.use("/admin", requireRole("admin"));
-
-export default userRoute;
+export default router;
