@@ -6,13 +6,16 @@ import {
   updateRecette,
   deleteRecette
 } from "../controllers/recette.controller.js";
+import { authenticate } from '../middlewares/auth.middleware.js';
+import { authorize } from '../middlewares/role.middleware.js';
 
 const router = Router();
 
 router.get("/", getRecettes);
 router.get("/:id", getRecetteById);
-router.post("/", createRecette);
-router.put("/:id", updateRecette);
-router.delete("/:id", deleteRecette);
+
+router.post("/", authenticate, authorize("staff"), createRecette);
+router.put("/:id", authenticate, authorize("staff"), updateRecette);
+router.delete("/:id", authenticate, authorize("staff"), deleteRecette);
 
 export default router;

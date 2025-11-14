@@ -1,10 +1,10 @@
 import swaggerJSDoc from "swagger-jsdoc";
 
-export const swaggerSpec = swaggerJsdoc({
+export const swaggerSpec = swaggerJSDoc({
     definition: {
         openapi: "3.0.0",
-        info:{
-            title : "TP Express",
+        info: {
+            title: "Restaurant by Cooking CORP.",
             version: "1.0.0",
         }
     },
