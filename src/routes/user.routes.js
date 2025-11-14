@@ -8,7 +8,7 @@ import {
     deleteUser
 } from "../controllers/user.controller.js";
 
-import { auth, requireRole } from "../middlewares/auth.js";
+import { auth, requireRole } from "../middlewares/auth.middleware.js";
 
 const userRoute = express.Router();
 
